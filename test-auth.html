@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeroTrack - Authentication Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">HeroTrack Authentication Test</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Authentication Status</h2>
+            <div id="auth-status" class="space-y-2">
+                <p>Loading...</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Actions</h2>
+            <div class="space-x-4">
+                <button id="sign-in-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Sign In (Mock)
+                </button>
+                <button id="sign-out-btn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    Sign Out
+                </button>
+                <button id="check-status-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Check Status
+                </button>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Debug Log</h2>
+            <div id="debug-log" class="bg-gray-100 p-4 rounded text-sm font-mono h-64 overflow-y-auto">
+                <!-- Debug messages will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple authentication simulation
+        const debugLog = document.getElementById('debug-log');
+        const authStatus = document.getElementById('auth-status');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugLog.innerHTML += `[${timestamp}] ${message}\n`;
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+        
+        function updateAuthStatus() {
+            const user = localStorage.getItem('herotrack_user');
+            if (user) {
+                const userData = JSON.parse(user);
+                authStatus.innerHTML = `
+                    <p class="text-green-600 font-semibold">✓ Authenticated</p>
+                    <p><strong>Name:</strong> ${userData.name}</p>
+                    <p><strong>Email:</strong> ${userData.email}</p>
+                    <p><strong>ID:</strong> ${userData.id}</p>
+                `;
+            } else {
+                authStatus.innerHTML = `
+                    <p class="text-red-600 font-semibold">✗ Not authenticated</p>
+                    <p>No user data found in localStorage</p>
+                `;
+            }
+        }
+        
+        function mockSignIn() {
+            log('Starting mock sign-in...');
+            const mockUser = {
+                id: 'mock-user-123',
+                email: 'demo@herotrack.com',
+                name: 'Demo User',
+                picture: 'https://via.placeholder.com/40'
+            };
+            
+            localStorage.setItem('herotrack_user', JSON.stringify(mockUser));
+            log('Mock user data saved to localStorage');
+            
+            // Dispatch auth change event
+            window.dispatchEvent(new CustomEvent('auth-change', { detail: mockUser }));
+            log('Auth change event dispatched');
+            
+            updateAuthStatus();
+            log('Mock sign-in completed');
+        }
+        
+        function signOut() {
+            log('Starting sign-out...');
+            localStorage.removeItem('herotrack_user');
+            log('User data removed from localStorage');
+            
+            // Dispatch auth change event
+            window.dispatchEvent(new CustomEvent('auth-change', { detail: null }));
+            log('Auth change event dispatched');
+            
+            updateAuthStatus();
+            log('Sign-out completed');
+        }
+        
+        // Event listeners
+        document.getElementById('sign-in-btn').addEventListener('click', mockSignIn);
+        document.getElementById('sign-out-btn').addEventListener('click', signOut);
+        document.getElementById('check-status-btn').addEventListener('click', () => {
+            log('Checking authentication status...');
+            updateAuthStatus();
+        });
+        
+        // Listen for auth changes
+        window.addEventListener('auth-change', (event) => {
+            log(`Auth change event received: ${event.detail ? 'User signed in' : 'User signed out'}`);
+            updateAuthStatus();
+        });
+        
+        // Initial status check
+        log('Authentication test page loaded');
+        updateAuthStatus();
+        
+        // Test localStorage
+        try {
+            localStorage.setItem('test', 'value');
+            localStorage.removeItem('test');
+            log('localStorage is working correctly');
+        } catch (error) {
+            log(`localStorage error: ${error.message}`);
+        }
+    </script>
+</body>
+</html>

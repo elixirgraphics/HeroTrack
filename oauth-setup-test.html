@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth Setup Test - HeroTrack</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">🔧 Google OAuth Setup Test</h1>
+            
+            <!-- Status Indicators -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-gray-900 mb-2">Google Script</h3>
+                    <div id="script-status" class="text-sm">
+                        <span class="text-yellow-600">⏳ Loading...</span>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-gray-900 mb-2">Client ID</h3>
+                    <div id="client-id-status" class="text-sm">
+                        <span class="text-yellow-600">⏳ Checking...</span>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-medium text-gray-900 mb-2">OAuth Ready</h3>
+                    <div id="oauth-status" class="text-sm">
+                        <span class="text-yellow-600">⏳ Testing...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-medium text-blue-900 mb-3">📋 Setup Instructions</h2>
+                <ol class="list-decimal list-inside space-y-2 text-blue-800">
+                    <li>Get your Google OAuth Client ID from <a href="https://console.cloud.google.com/" target="_blank" class="underline">Google Cloud Console</a></li>
+                    <li>Update the <code class="bg-blue-100 px-1 rounded">.env</code> file with your Client ID</li>
+                    <li>Restart your development server: <code class="bg-blue-100 px-1 rounded">npm run dev</code></li>
+                    <li>Refresh this page to test the setup</li>
+                </ol>
+            </div>
+
+            <!-- Current Configuration -->
+            <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-3">⚙️ Current Configuration</h2>
+                <div class="space-y-2 text-sm">
+                    <div><strong>Client ID:</strong> <span id="current-client-id" class="font-mono text-xs bg-gray-200 px-2 py-1 rounded">Loading...</span></div>
+                    <div><strong>Environment:</strong> <span id="environment">Development</span></div>
+                    <div><strong>Origin:</strong> <span id="current-origin" class="font-mono text-xs bg-gray-200 px-2 py-1 rounded">Loading...</span></div>
+                </div>
+            </div>
+
+            <!-- Test Authentication -->
+            <div class="border-t pt-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">🧪 Test Authentication</h2>
+                
+                <div id="auth-test-area">
+                    <button 
+                        id="test-google-auth" 
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                        disabled
+                    >
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        <span>Test Google Sign-In</span>
+                    </button>
+                    
+                    <div id="auth-result" class="mt-4 hidden">
+                        <!-- Results will be shown here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                <h2 class="text-lg font-medium text-yellow-900 mb-3">🔧 Troubleshooting</h2>
+                <div class="space-y-2 text-yellow-800 text-sm">
+                    <p><strong>If Google Script fails to load:</strong> Check your internet connection and try refreshing</p>
+                    <p><strong>If Client ID is invalid:</strong> Make sure you copied the full Client ID from Google Cloud Console</p>
+                    <p><strong>If OAuth initialization fails:</strong> Check that your domain is added to authorized origins</p>
+                    <p><strong>If sign-in doesn't work:</strong> Open browser dev tools and check the console for errors</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CLIENT_ID = '974614962211-0fj3h3d937f3n40ihtmt7deier9pnr6r.apps.googleusercontent.com'; // This will be replaced by your actual ID
+        
+        // Status tracking
+        let googleScriptLoaded = false;
+        let googleInitialized = false;
+
+        // Update status indicators
+        function updateStatus(elementId, status, message) {
+            const element = document.getElementById(elementId);
+            const icons = {
+                loading: '⏳',
+                success: '✅',
+                error: '❌',
+                warning: '⚠️'
+            };
+            const colors = {
+                loading: 'text-yellow-600',
+                success: 'text-green-600',
+                error: 'text-red-600',
+                warning: 'text-orange-600'
+            };
+            
+            element.innerHTML = `<span class="${colors[status]}">${icons[status]} ${message}</span>`;
+        }
+
+        // Check Google script loading
+        function checkGoogleScript() {
+            if (window.google && window.google.accounts) {
+                googleScriptLoaded = true;
+                updateStatus('script-status', 'success', 'Google script loaded');
+                initializeGoogleAuth();
+            } else {
+                updateStatus('script-status', 'error', 'Google script failed to load');
+            }
+        }
+
+        // Check client ID
+        function checkClientId() {
+            if (CLIENT_ID && CLIENT_ID !== 'your-google-client-id-here.apps.googleusercontent.com') {
+                updateStatus('client-id-status', 'success', 'Client ID configured');
+                document.getElementById('current-client-id').textContent = CLIENT_ID;
+            } else {
+                updateStatus('client-id-status', 'warning', 'Using demo Client ID');
+                document.getElementById('current-client-id').textContent = 'Demo/Placeholder ID';
+            }
+        }
+
+        // Initialize Google OAuth
+        function initializeGoogleAuth() {
+            try {
+                window.google.accounts.id.initialize({
+                    client_id: CLIENT_ID,
+                    callback: handleCredentialResponse,
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
+                
+                googleInitialized = true;
+                updateStatus('oauth-status', 'success', 'OAuth ready');
+                document.getElementById('test-google-auth').disabled = false;
+            } catch (error) {
+                console.error('Google OAuth initialization failed:', error);
+                updateStatus('oauth-status', 'error', 'OAuth initialization failed');
+            }
+        }
+
+        // Handle Google sign-in response
+        function handleCredentialResponse(response) {
+            try {
+                const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                const user = {
+                    id: payload.sub,
+                    email: payload.email,
+                    name: payload.name,
+                    picture: payload.picture
+                };
+                
+                showAuthResult(true, user);
+            } catch (error) {
+                console.error('Error parsing credential response:', error);
+                showAuthResult(false, null, error.message);
+            }
+        }
+
+        // Show authentication result
+        function showAuthResult(success, user, error) {
+            const resultDiv = document.getElementById('auth-result');
+            resultDiv.classList.remove('hidden');
+            
+            if (success) {
+                resultDiv.innerHTML = `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 class="text-green-900 font-medium mb-2">✅ Authentication Successful!</h3>
+                        <div class="space-y-2 text-sm text-green-800">
+                            <div class="flex items-center space-x-3">
+                                <img src="${user.picture}" alt="${user.name}" class="w-12 h-12 rounded-full">
+                                <div>
+                                    <p><strong>Name:</strong> ${user.name}</p>
+                                    <p><strong>Email:</strong> ${user.email}</p>
+                                </div>
+                            </div>
+                            <p class="text-xs"><strong>Avatar URL:</strong> ${user.picture}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <h3 class="text-red-900 font-medium mb-2">❌ Authentication Failed</h3>
+                        <p class="text-sm text-red-800">${error || 'Unknown error occurred'}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Test Google authentication
+        function testGoogleAuth() {
+            if (googleInitialized) {
+                try {
+                    window.google.accounts.id.prompt();
+                } catch (error) {
+                    console.error('Google sign-in failed:', error);
+                    showAuthResult(false, null, error.message);
+                }
+            }
+        }
+
+        // Initialize page
+        function initializePage() {
+            // Update current origin
+            document.getElementById('current-origin').textContent = window.location.origin;
+            
+            // Check client ID
+            checkClientId();
+            
+            // Check Google script (with delay to ensure it's loaded)
+            setTimeout(checkGoogleScript, 1000);
+        }
+
+        // Event listeners
+        document.getElementById('test-google-auth').addEventListener('click', testGoogleAuth);
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+        
+        // Also check when Google script loads
+        window.addEventListener('load', () => {
+            setTimeout(checkGoogleScript, 500);
+        });
+    </script>
+</body>
+</html>

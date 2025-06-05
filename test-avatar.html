@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avatar Test - HeroTrack</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Avatar Test Page</h1>
+        
+        <div class="space-y-6">
+            <!-- Test different avatar sources -->
+            <div class="card bg-white p-6 rounded-lg shadow">
+                <h2 class="text-lg font-medium mb-4">Avatar Sources Test</h2>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Mock avatar (Unsplash) -->
+                    <div class="text-center">
+                        <img 
+                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format&q=80" 
+                            alt="Mock User" 
+                            class="w-16 h-16 rounded-full mx-auto mb-2"
+                            onload="console.log('Mock avatar loaded successfully')"
+                            onerror="console.error('Mock avatar failed to load'); this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <div class="w-16 h-16 rounded-full mx-auto mb-2 bg-gray-200 flex items-center justify-center hidden">
+                            <svg class="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm text-gray-600">Mock Avatar (Unsplash)</p>
+                    </div>
+                    
+                    <!-- Google avatar example -->
+                    <div class="text-center">
+                        <img 
+                            src="https://lh3.googleusercontent.com/a/default-user=s200-c" 
+                            alt="Google User" 
+                            class="w-16 h-16 rounded-full mx-auto mb-2"
+                            onload="console.log('Google avatar loaded successfully')"
+                            onerror="console.error('Google avatar failed to load'); this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                        >
+                        <div class="w-16 h-16 rounded-full mx-auto mb-2 bg-gray-200 flex items-center justify-center hidden">
+                            <svg class="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm text-gray-600">Google Avatar (Enhanced)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Test localStorage user data -->
+            <div class="card bg-white p-6 rounded-lg shadow">
+                <h2 class="text-lg font-medium mb-4">Current User Data</h2>
+                <div id="user-data" class="text-sm text-gray-600">
+                    Loading...
+                </div>
+            </div>
+            
+            <!-- Test authentication -->
+            <div class="card bg-white p-6 rounded-lg shadow">
+                <h2 class="text-lg font-medium mb-4">Authentication Test</h2>
+                <button 
+                    id="test-auth" 
+                    class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                    Test Mock Authentication
+                </button>
+                <button 
+                    id="clear-auth" 
+                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 ml-2"
+                >
+                    Clear Authentication
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Display current user data
+        function displayUserData() {
+            const userStr = localStorage.getItem('herotrack_user');
+            const userDataDiv = document.getElementById('user-data');
+            
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                userDataDiv.innerHTML = `
+                    <div class="space-y-2">
+                        <p><strong>Name:</strong> ${user.name}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>ID:</strong> ${user.id}</p>
+                        <p><strong>Picture URL:</strong> <a href="${user.picture}" target="_blank" class="text-blue-600 hover:underline">${user.picture}</a></p>
+                        <div class="flex items-center space-x-2">
+                            <strong>Avatar Preview:</strong>
+                            <img src="${user.picture}" alt="${user.name}" class="w-8 h-8 rounded-full">
+                        </div>
+                    </div>
+                `;
+            } else {
+                userDataDiv.innerHTML = '<p class="text-gray-500">No user data found</p>';
+            }
+        }
+        
+        // Mock authentication function
+        function performMockAuth() {
+            const mockUser = {
+                id: 'mock-user-123',
+                email: 'demo@herotrack.com',
+                name: 'Demo User',
+                picture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format&q=80'
+            };
+            localStorage.setItem('herotrack_user', JSON.stringify(mockUser));
+            displayUserData();
+            console.log('Mock authentication completed', mockUser);
+        }
+        
+        // Clear authentication
+        function clearAuth() {
+            localStorage.removeItem('herotrack_user');
+            displayUserData();
+            console.log('Authentication cleared');
+        }
+        
+        // Event listeners
+        document.getElementById('test-auth').addEventListener('click', performMockAuth);
+        document.getElementById('clear-auth').addEventListener('click', clearAuth);
+        
+        // Initial load
+        displayUserData();
+    </script>
+</body>
+</html>
